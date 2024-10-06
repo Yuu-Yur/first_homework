@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상세 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .back-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .item-details {
+            display: flex;
+            margin-top: 20px;
+        }
+        .item-details img {
+            max-width: 300px;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .name {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .creator, .tags, .release-date, .rating {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .review-section {
+            margin-top: 30px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        .review-section h2 {
+            margin-bottom: 10px;
+        }
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .review-form textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .review-form button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .reviews {
+            list-style: none;
+            padding: 0;
+        }
+        .reviews li {
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .review-meta {
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>아이템 상세 페이지</h1>
+            <button class="back-button" onclick="goBack()">뒤로가기</button>
+        </div>
+        
+        <div class="item-details" id="itemDetails">
+            <!-- 아이템 세부 정보가 여기에 추가됩니다 -->
+        </div>
+
+        <div class="review-section">
+            <h2>리뷰 남기기</h2>
+            <div class="review-form">
+                <textarea id="reviewInput" rows="4" placeholder="리뷰를 작성하세요..." required></textarea>
+                <button onclick="submitReview()">리뷰 제출</button>
+            </div>
+            <h2>리뷰 목록</h2>
+            <ul id="reviews" class="reviews">
+                <!-- 리뷰 목록이 여기에 추가됩니다 -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            { img: 'image1.jpg', name: 'Item 1', creator: 'John Doe', tags: '#tag1 #tag2 #tag3', releaseDate: '2024-01-01', rating: 4, id: 1 },
+            { img: 'image2.jpg', name: 'Item 2', creator: 'Jane Smith', tags: '#tag4 #tag5 #tag6', releaseDate: '2024-02-01', rating: 3, id: 2 },
+            // 다른 아이템들...
+        ];
+
+        const reviews = []; // 리뷰를 저장할 배열
+
+        function getItemId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return parseInt(urlParams.get('id'));
+        }
+
+        function displayItemDetails(itemId) {
+            const item = items.find(item => item.id === itemId);
+            if (!item) {
+                document.getElementById('itemDetails').innerHTML = '<p>아이템을 찾을 수 없습니다.</p>';
+                return;
+            }
+            const itemDetailsDiv = document.getElementById('itemDetails');
+            itemDetailsDiv.innerHTML = `
+                <img src="${item.img}" alt="${item.name}">
+                <div class="info">
+                    <div class="name">${item.name}</div>
+                    <div class="creator">제작자: ${item.creator}</div>
+                    <div class="tags">태그: ${item.tags}</div>
+                    <div class="release-date">발매일: ${item.releaseDate}</div>
+                    <div class="rating">별점: ${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</div>
+                </div>
+            `;
+        }
+
+        function submitReview() {
+            const reviewInput = document.getElementById('reviewInput');
+            const reviewText = reviewInput.value.trim();
+
+            if (reviewText) {
+                const reviewDate = new Date().toLocaleString(); // 현재 날짜 및 시간
+                reviews.push({ reviewText, reviewDate });
+                reviewInput.value = ''; // 입력창 초기화
+                displayReviews();
+            }
+        }
+
+        function displayReviews() {
+            const reviewsList = document.getElementById('reviews');
+            reviewsList.innerHTML = ''; // 기존 리뷰 초기화
+            reviews.forEach(({ reviewText, reviewDate }) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <p>${reviewText}</p>
+                    <div class="review-meta">${reviewDate}</div>
+                `;
+                reviewsList.appendChild(li);
+            });
+        }
+
+        function goBack() {
+            window.history.back(); // 뒤로가기 버튼 클릭 시 이전 페이지로 이동
+        }
+
+        // 페이지 로드 시 아이템 ID에 따라 세부 정보 표시
+        const itemId = getItemId();
+        displayItemDetails(itemId);
+    </script>
+
+</body>
+</html>
